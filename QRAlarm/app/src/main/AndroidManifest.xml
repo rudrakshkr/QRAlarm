@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Camera access for the QR mission (CameraX + ML Kit) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-feature android:name="android.hardware.camera" android:required="true" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
+
+    <!-- Exact alarm scheduling (Android 12+ requires this to call setExactAndAllowWhileIdle
+         reliably; SCHEDULE_EXACT_ALARM is auto-granted on install for alarm-clock-style apps
+         declaring USE_EXACT_ALARM on API 33+, but we request both for broad compatibility). -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+
+    <!-- Re-register alarms after a reboot, since AlarmManager entries do not survive one -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Foreground service that keeps the alarm ringing -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+
+    <!-- Notification channel for the ringing/ongoing alarm notification (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Loop the alarm tone and vibrate until the mission is solved -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+
+    <!-- Draw the full-screen alarm UI over the lock screen -->
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@android:style/Theme.Material.Light.NoActionBar">
+
+        <!--
+          Additional entries (MainActivity, AlarmRingingActivity, AlarmService,
+          AlarmReceiver, BootReceiver) are appended here stage by stage as we
+          build each of them, so the manifest always reflects exactly what
+          exists in the project so far.
+        -->
+
+    </application>
+
+</manifest>
