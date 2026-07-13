@@ -1,0 +1,52 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      # Provisions a real, official Gradle 8.7 install on the runner. We use
+      # this (rather than trusting a hand-committed gradle-wrapper.jar) to
+      # *regenerate* the wrapper below, so the jar that ships in this repo
+      # is always byte-identical to what Gradle itself produces.
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.7'
+
+      # Regenerates gradlew, gradlew.bat, gradle-wrapper.jar and
+      # gradle-wrapper.properties from the official Gradle install above.
+      # Safe to run every time: if a correct wrapper is already committed,
+      # this just rewrites it identically. Once you've generated and
+      # committed a real gradle-wrapper.jar yourself (see README), you can
+      # delete this step and go straight to "Build debug APK".
+      - name: Regenerate Gradle Wrapper
+        run: gradle wrapper --gradle-version 8.7 --distribution-type bin
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/app-debug.apk
